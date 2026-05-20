@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecoelétrica — Separação de Obras</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --eco-blue:#002060; --eco-blue-light:#0a3d8f; --eco-green:#34a853;
+  --eco-green-dark:#1e7e34; --white:#fff; --gray-50:#f8f9fa;
+  --gray-100:#e9ecef; --gray-200:#dee2e6; --gray-400:#868e96;
+  --gray-600:#495057; --gray-800:#212529;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Barlow',sans-serif;background:var(--eco-blue);color:var(--white);min-height:100vh}
+header{background:var(--eco-blue);border-bottom:3px solid var(--eco-green);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:72px;position:sticky;top:0;z-index:100}
+.logo-area{display:flex;align-items:center;gap:14px}
+.logo-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:1px;text-transform:uppercase;line-height:1.1}
+.logo-title span{display:block;font-size:11px;font-weight:600;color:var(--eco-green);letter-spacing:3px}
+nav{display:flex;gap:4px}
+nav a{color:rgba(255,255,255,0.7);text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:8px 16px;border-radius:6px;transition:all .2s;cursor:pointer}
+nav a:hover,nav a.active{color:var(--white);background:rgba(52,168,83,.2)}
+nav a.active{color:var(--eco-green)}
+.hero-strip{background:linear-gradient(90deg,#001040,#002060 50%,#001a4d);padding:2rem 2rem 0;border-bottom:1px solid rgba(52,168,83,.3)}
+.hero-strip h1{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:700;text-transform:uppercase;margin-bottom:4px}
+.hero-strip h1 span{color:var(--eco-green)}
+.hero-strip p{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:1.5rem}
+.tabs{display:flex;margin-top:1rem}
+.tab{padding:10px 24px;font-size:13px;font-weight:600;text-transform:uppercase;color:rgba(255,255,255,.5);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;user-select:none}
+.tab:hover{color:rgba(255,255,255,.8)}
+.tab.active{color:var(--eco-green);border-bottom-color:var(--eco-green)}
+main{background:var(--gray-50);min-height:calc(100vh - 72px);color:var(--gray-800)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.filter-bar{background:var(--white);border-bottom:1px solid var(--gray-200);padding:1rem 2rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.filter-bar label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-600);white-space:nowrap}
+.filter-bar input[type="date"],.filter-bar select{height:36px;border:1px solid var(--gray-200);border-radius:6px;padding:0 10px;font-size:13px;font-family:'Barlow',sans-serif;color:var(--gray-800);background:var(--gray-50);outline:none;transition:border-color .2s}
+.filter-bar input[type="date"]:focus,.filter-bar select:focus{border-color:var(--eco-green)}
+.filter-sep{width:1px;height:24px;background:var(--gray-200)}
+.btn-update{height:36px;padding:0 18px;background:var(--eco-green);color:var(--white);border:none;border-radius:6px;font-size:13px;font-weight:600;font-family:'Barlow',sans-serif;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .2s}
+.btn-update:hover{background:var(--eco-green-dark)}
+.btn-update svg{width:15px;height:15px}
+.btn-update.loading svg{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn-filter{height:36px;padding:0 18px;background:var(--eco-blue);color:var(--white);border:none;border-radius:6px;font-size:13px;font-weight:600;font-family:'Barlow',sans-serif;cursor:pointer;transition:background .2s}
+.btn-filter:hover{background:var(--eco-blue-light)}
+.stats-bar{display:flex;gap:1rem;padding:1rem 2rem;background:var(--gray-50);border-bottom:1px solid var(--gray-200)}
+.stat-card{background:var(--white);border:1px solid var(--gray-200);border-radius:8px;padding:10px 18px;min-width:120px;text-align:center}
+.stat-card .stat-num{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;color:var(--eco-blue);line-height:1}
+.stat-card .stat-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-400);margin-top:2px}
+.stat-card.green .stat-num{color:var(--eco-green-dark)}
+.stat-card.orange .stat-num{color:#e65100}
+.status-bar{padding:8px 2rem;font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px}
+.status-bar.info{background:#e3f2fd;color:#0d47a1}
+.status-bar.success{background:#e8f5e9;color:#1b5e20}
+.status-bar.error{background:#ffebee;color:#b71c1c}
+.status-bar.loading{background:#fff8e1;color:#e65100}
+.status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
+.table-wrapper{padding:1.5rem 2rem;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;background:var(--white);border-radius:10px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:0 1px 4px rgba(0,32,96,.06)}
+thead tr{background:var(--eco-blue);color:var(--white)}
+thead th{padding:11px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--gray-100);transition:background .1s}
+tbody tr:hover{background:rgba(52,168,83,.05)}
+tbody tr:last-child{border-bottom:none}
+tbody td{padding:10px 14px;color:var(--gray-800);vertical-align:middle}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap}
+.badge-lm{background:#e3f2fd;color:#0d47a1}
+.badge-lv{background:#e8f5e9;color:#1b5e20}
+.badge-folga{background:#fff8e1;color:#e65100}
+.badge-outros{background:var(--gray-100);color:var(--gray-600)}
+.projeto-cell{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;color:var(--eco-blue)}
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--gray-400)}
+.empty-state svg{width:48px;height:48px;margin:0 auto 1rem;opacity:.4;display:block}
+.empty-state p{font-size:14px;font-weight:500}
+.config-section{padding:2rem;max-width:680px}
+.config-section h2{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--eco-blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1.5rem;padding-bottom:10px;border-bottom:2px solid var(--eco-green)}
+.config-field{margin-bottom:1rem}
+.config-field label{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-600);margin-bottom:6px}
+.config-field input{width:100%;height:40px;border:1px solid var(--gray-200);border-radius:6px;padding:0 12px;font-size:13px;font-family:'Barlow',sans-serif;color:var(--gray-800)}
+.config-field input:focus{outline:none;border-color:var(--eco-green)}
+.config-note{font-size:12px;color:var(--gray-400);margin-top:4px;line-height:1.5}
+.btn-save{height:40px;padding:0 24px;background:var(--eco-blue);color:var(--white);border:none;border-radius:6px;font-size:13px;font-weight:600;font-family:'Barlow',sans-serif;cursor:pointer;margin-top:1rem;transition:background .2s}
+.btn-save:hover{background:var(--eco-blue-light)}
+footer{background:var(--eco-blue);color:rgba(255,255,255,.4);text-align:center;font-size:11px;padding:14px;letter-spacing:.5px}
+footer span{color:var(--eco-green)}
+@media(max-width:768px){header{padding:0 1rem}.filter-bar{padding:1rem}.stats-bar{padding:.75rem 1rem;flex-wrap:wrap}.table-wrapper{padding:1rem}.hero-strip{padding:1.5rem 1rem 0}.hero-strip h1{font-size:26px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <svg width="38" height="38" viewBox="0 0 100 100" fill="none">
+      <path d="M50 5 C28 5 10 23 10 50 C10 72 25 88 45 94 L50 96 L55 94 C75 88 90 72 90 50 C90 23 72 5 50 5Z" fill="#34a853" opacity="0.15"/>
+      <path d="M40 15 L25 55 L45 55 L35 85 L70 40 L50 40 L65 15Z" fill="#34a853"/>
+    </svg>
+    <div class="logo-title">ecoelétrica<span>Engenharia</span></div>
+  </div>
+  <nav>
+    <a class="active" onclick="showTab('separacao',this)">Separação</a>
+    <a onclick="showTab('config',this)">Configurações</a>
+  </nav>
+</header>
+
+<div class="hero-strip">
+  <h1>Separação de <span>Obras</span></h1>
+  <p>Programação de equipes · Petrolina / Serra Talhada / Ouricuri</p>
+  <div class="tabs">
+    <div class="tab active" onclick="switchEquipe('todas',this)">Todas</div>
+    <div class="tab" onclick="switchEquipe('lm',this)">Linha Morta</div>
+    <div class="tab" onclick="switchEquipe('lv',this)">Linha Viva</div>
+    <div class="tab" onclick="switchEquipe('folga',this)">Folga</div>
+  </div>
+</div>
+
+<main>
+
+<div id="tab-separacao" class="tab-content active">
+  <div class="filter-bar">
+    <label>Data início</label>
+    <input type="date" id="dt-inicio"/>
+    <label>Data fim</label>
+    <input type="date" id="dt-fim"/>
+    <div class="filter-sep"></div>
+    <label>Base</label>
+    <select id="sel-base">
+      <option value="">Todas</option>
+      <option value="PETROLINA">Petrolina</option>
+      <option value="SERRA TALHADA">Serra Talhada</option>
+      <option value="OURICURI">Ouricuri</option>
+    </select>
+    <button class="btn-filter" onclick="aplicarFiltros()">Filtrar</button>
+    <div class="filter-sep"></div>
+    <button class="btn-update" id="btn-update" onclick="acionarScript()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="icon-refresh">
+        <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+      </svg>
+      Atualizar Planilha
+    </button>
+  </div>
+
+  <div id="status-bar" class="status-bar info" style="display:none"></div>
+
+  <div class="stats-bar">
+    <div class="stat-card"><div class="stat-num" id="stat-total">—</div><div class="stat-label">Total</div></div>
+    <div class="stat-card green"><div class="stat-num" id="stat-lm">—</div><div class="stat-label">Linha Morta</div></div>
+    <div class="stat-card green"><div class="stat-num" id="stat-lv">—</div><div class="stat-label">Linha Viva</div></div>
+    <div class="stat-card orange"><div class="stat-num" id="stat-folga">—</div><div class="stat-label">Folgas</div></div>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead><tr><th>#</th><th>Projeto</th><th>Encarregado</th><th>Equipe</th><th>Data Programação</th><th>Base</th><th>#Separação</th></tr></thead>
+      <tbody id="tbody-obras">
+        <tr><td colspan="7"><div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+          <p>Configure a URL do script e clique em <strong>Atualizar Planilha</strong> para carregar os dados.</p>
+        </div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div id="tab-config" class="tab-content">
+  <div class="config-section">
+    <h2>Configurações de Integração</h2>
+    <div class="config-field">
+      <label>URL do Web App (Google Apps Script)</label>
+      <input type="text" id="cfg-webapp-url" placeholder="https://script.google.com/macros/s/.../exec"/>
+      <p class="config-note">Cole a URL do Web App publicado no Apps Script.</p>
+    </div>
+    <div class="config-field">
+      <label>Base padrão</label>
+      <select id="cfg-base-padrao" style="width:100%;height:40px;border:1px solid #dee2e6;border-radius:6px;padding:0 12px;font-size:13px;font-family:'Barlow',sans-serif;color:#212529">
+        <option value="PETROLINA">Petrolina</option>
+        <option value="SERRA TALHADA">Serra Talhada</option>
+        <option value="OURICURI">Ouricuri</option>
+        <option value="">Todas</option>
+      </select>
+    </div>
+    <button class="btn-save" onclick="salvarConfig()">Salvar configurações</button>
+    <p id="cfg-msg" style="font-size:12px;color:var(--eco-green-dark);margin-top:8px;display:none">✓ Configurações salvas!</p>
+  </div>
+</div>
+
+
+</main>
+
+<footer>&copy; 2026 <span>ecoelétrica</span> engenharia · Sistema de Separação de Obras</footer>
+
+<script>
+let todosOsDados = [];
+let filtroEquipe = 'todas';
+
+function showTab(nome, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('tab-' + nome).classList.add('active');
+  el.classList.add('active');
+}
+
+function switchEquipe(tipo, el) {
+  filtroEquipe = tipo;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderTabela();
+}
+
+(function setDefaultDates() {
+  const hoje = new Date();
+  const fmt = d => d.toISOString().split('T')[0];
+  document.getElementById('dt-inicio').value = fmt(hoje);
+  document.getElementById('dt-fim').value = fmt(hoje);
+})();
+
+function salvarConfig() {
+  localStorage.setItem('eco_webapp_url', document.getElementById('cfg-webapp-url').value);
+  localStorage.setItem('eco_base_padrao', document.getElementById('cfg-base-padrao').value);
+  const msg = document.getElementById('cfg-msg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 3000);
+}
+
+function carregarConfig() {
+  const url = localStorage.getItem('eco_webapp_url') || 'https://script.google.com/macros/s/AKfycbybDH7zl-DY81BEkhQ3SIQi8BjSTc1WnbByOup-M9lMMIbIrdDn69s8XKs5NkbmS_jE/exec';
+  const base = localStorage.getItem('eco_base_padrao') || 'PETROLINA';
+  document.getElementById('cfg-webapp-url').value = url;
+  document.getElementById('cfg-base-padrao').value = base;
+}
+
+function setStatus(msg, tipo) {
+  const el = document.getElementById('status-bar');
+  el.className = 'status-bar ' + tipo;
+  el.innerHTML = '<div class="status-dot"></div>' + msg;
+  el.style.display = 'flex';
+  if (tipo === 'success') setTimeout(() => el.style.display = 'none', 5000);
+}
+
+async function acionarScript() {
+  const btn = document.getElementById('btn-update');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  setStatus('Buscando dados da planilha...', 'loading');
+
+  try {
+    const dtInicio = document.getElementById('dt-inicio').value;
+    const dtFim    = document.getElementById('dt-fim').value;
+    const base     = document.getElementById('sel-base').value || '';
+    const params   = new URLSearchParams({ action: 'getSeparacao', dtInicio, dtFim, base });
+    const resp     = await fetch(`/api?${params}`);
+    const json     = await resp.json();
+
+    if (json.status === 'ok' && Array.isArray(json.data)) {
+      todosOsDados = json.data;
+      renderTabela();
+      setStatus('✓ ' + json.data.length + ' registros carregados com sucesso.', 'success');
+    } else {
+      setStatus('Erro: ' + JSON.stringify(json), 'error');
+    }
+  } catch (err) {
+    setStatus('Erro ao conectar: ' + err.message, 'error');
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+function aplicarFiltros() { renderTabela(); }
+
+function detectarEquipe(enc) {
+  if (!enc) return 'outros';
+  const s = String(enc).toUpperCase();
+  if (s === 'FOLGA') return 'folga';
+  if (s.includes('LINHA MORTA')) return 'lm';
+  if (s.includes('LINHA VIVA')) return 'lv';
+  return 'outros';
+}
+
+function limparNome(enc) {
+  return String(enc || '').replace(/^LINHA MORTA\s*-\s*/i, '').replace(/^LINHA VIVA\s*-\s*/i, '').trim();
+}
+
+function parseDate(val) {
+  if (!val) return null;
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(val)) {
+    const [d, m, y] = val.split('/');
+    return new Date(`${y}-${m}-${d}T00:00:00`);
+  }
+  return new Date(val);
+}
+
+function formatDate(val) {
+  if (!val) return '—';
+  const d = parseDate(val);
+  if (!d || isNaN(d)) return val;
+  return d.toLocaleDateString('pt-BR');
+}
+
+function renderTabela() {
+  const dtI = document.getElementById('dt-inicio').value;
+  const dtF = document.getElementById('dt-fim').value;
+  const base = document.getElementById('sel-base').value;
+
+  let dados = todosOsDados.filter(row => {
+    if (base && row.base && row.base.toUpperCase() !== base.toUpperCase()) return false;
+    if (dtI || dtF) {
+      const d = parseDate(row.data);
+      if (!d) return true;
+      if (dtI && d < new Date(dtI + 'T00:00:00')) return false;
+      if (dtF && d > new Date(dtF + 'T23:59:59')) return false;
+    }
+    return true;
+  });
+
+  if (filtroEquipe !== 'todas') {
+    dados = dados.filter(r => detectarEquipe(r.encarregado) === filtroEquipe);
+  }
+
+  document.getElementById('stat-total').textContent = dados.length;
+  document.getElementById('stat-lm').textContent = dados.filter(r => detectarEquipe(r.encarregado) === 'lm').length;
+  document.getElementById('stat-lv').textContent = dados.filter(r => detectarEquipe(r.encarregado) === 'lv').length;
+  document.getElementById('stat-folga').textContent = dados.filter(r => detectarEquipe(r.encarregado) === 'folga').length;
+
+  const tbody = document.getElementById('tbody-obras');
+
+  if (dados.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><p>Nenhum registro encontrado.</p></div></td></tr>';
+    return;
+  }
+
+  const badgeClass = { lm:'badge-lm', lv:'badge-lv', folga:'badge-folga', outros:'badge-outros' };
+  const badgeLabel = { lm:'LM', lv:'LV', folga:'Folga', outros:'—' };
+
+  tbody.innerHTML = dados.map((row, i) => {
+    const eq = detectarEquipe(row.encarregado);
+    return `<tr>
+      <td style="color:var(--gray-400);font-size:11px">${i+1}</td>
+      <td style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;color:var(--eco-blue)">${row.projeto||'—'}</td>
+      <td>${limparNome(row.encarregado)||'—'}</td>
+      <td><span class="badge ${badgeClass[eq]}">${badgeLabel[eq]}</span></td>
+      <td>${formatDate(row.data)}</td>
+      <td>${row.base||'—'}</td>
+      <td><input style="width:120px;border:1px solid var(--gray-200);border-radius:4px;padding:4px 8px;font-size:12px" type="text" value="${row.separacao||''}" placeholder="Separação..."/></td>
+    </tr>`;
+  }).join('');
+}
+
+carregarConfig();
+</script>
+</body>
+</html>
